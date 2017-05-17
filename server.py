@@ -2,9 +2,10 @@ from flask import Flask, render_template, request, jsonify, abort
 from models import db, Article
 from werkzeug.contrib.fixers import ProxyFix
 
+
 app = Flask(__name__)
 app.wsgi_app = ProxyFix(app.wsgi_app)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///articles.db'
+app.config.from_object('config')
 db.init_app(app)
 
 

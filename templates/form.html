@@ -1,33 +1,11 @@
-<!DOCTYPE html>
-<html lang="ru">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <meta name="description" content="Anonymous">
-    <meta name="author" content="">
-    <link rel="icon" href="/static/img/favicon.ico">
+{% extends "_base.html" %}
 
-    <title>Anonymous</title>
+{% block description %}"Anonymous"{% endblock %}
+{% block title %}Anonymous{% endblock %}
+{% block navbar %}Anonymous{% endblock %}
 
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
-
-  </head>
-
-  <body>
-
-    <nav class="navbar">
-      <div class="container">
-        <div class="navbar-header">
-          <a class="navbar-brand" href="/">Anonymous</a>
-        </div>
-      </div>
-    </nav>
-
-    <div class="container">
-      <form id="article_form" method="POST">
+{% block container %}
+      <form method="POST">
         <div class="form-group">
           <input name="header" class="form-control" placeholder="Заголовок" autofocus/>
         </div>
@@ -38,50 +16,7 @@
           <textarea name="body" class="form-control" rows="10" placeholder="Ваша история"></textarea>
         </div>
         <div class="form-group">
-          <button class="btn btn-primary" type="button">Опубликовать</button>
+          <button class="btn btn-primary" type="submit">Опубликовать</button>
         </div>
       </form>
-    </div><!-- /.container -->
-
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-    <script type="text/javascript">
-      function GUID() {
-        function S() {
-          return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1)
-        }
-        return (S()+S()+'-'+S()+'-'+S()+'-'+S()+'-'+S()+S()+S()).toUpperCase();
-      }
-
-      function set_cookie(name, value, path, max_age) {
-        var cookie_string = name + '=' + escape(value);
-        if (path)
-          cookie_string += '; path=' + path + '; max-age=' + max_age;
-        document.cookie = cookie_string;
-      }
-
-      function delete_cookie(cookie_name) {
-        var cookie_date = new Date();
-        cookie_date.setTime(cookie_date.getTime() - 1);
-        document.cookie = cookie_name += '=; expires=' + cookie_date.toGMTString();
-      }
-
-      $('.btn').click(function(){
-        var guid = GUID();
-        set_cookie('guid', guid);
-
-        $.ajax({
-          url: '/',
-          type: 'POST',
-          dataType: 'json',
-          data: $('form').serialize(),
-          success: function(response) {
-            delete_cookie('guid');
-            set_cookie('guid', guid, response.url, 60 * 60 * 24);
-            document.location.href = response.url;
-          }
-        });
-      });
-    </script>
-  </body>
-</html>
+{% endblock container %}

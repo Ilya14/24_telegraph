@@ -1,7 +1,7 @@
-from flask import Flask, render_template, request, jsonify, abort
+from flask import Flask, make_response, redirect, render_template, request, jsonify, abort
 from models import db, Article
 from werkzeug.contrib.fixers import ProxyFix
-
+from uuid import uuid4
 
 app = Flask(__name__)
 app.wsgi_app = ProxyFix(app.wsgi_app)
@@ -16,22 +16,25 @@ def form():
 
 @app.route('/', methods=['POST'])
 def new_article():
-    guid = request.cookies.get('guid')
-    article = Article(guid, request.form['header'], request.form['signature'], request.form['body'])
+    article_uuid = str(uuid4())
+    article = Article(article_uuid, request.form['header'], request.form['signature'], request.form['body'])
     db.session.add(article)
     db.session.commit()
-    return jsonify({'url': '/articles/{0}'.format(article.id)})
+    article_url = '/articles/{0}'.format(article.id)
+    response = make_response(redirect(article_url))
+    max_cookie_age = 60 * 60 * 24 * 365
+    response.set_cookie('uuid', article_uuid, path=article_url, max_age=max_cookie_age)
+    return response
 
 
 @app.route('/articles/<id>')
 def article(id):
-    guid = request.cookies.get('guid')
     article = Article.query.filter_by(id=id).first()
-
     if article is None:
         abort(404)
 
-    if article.guid == guid:
+    article_uuid = request.cookies.get('uuid')
+    if article.uuid == article_uuid:
         return render_template('auth_article.html',
                                id=id,
                                header=article.header,
@@ -60,7 +63,7 @@ def edit(id):
         article.body = request.form['body']
         db.session.add(article)
         db.session.commit()
-        return jsonify({'url': '/articles/{0}'.format(article.id)})
+        return redirect('/articles/{0}'.format(article.id))
 
 
 @app.errorhandler(404)
